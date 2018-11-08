@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:p="http://www.springframework.org/schema/p"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:aop="http://www.springframework.org/schema/aop"
+	   xmlns:tx="http://www.springframework.org/schema/tx"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+    	 http://www.springframework.org/schema/beans/spring-beans.xsd
+     	 http://www.springframework.org/schema/context
+         http://www.springframework.org/schema/context/spring-context.xsd
+         http://www.springframework.org/schema/aop
+         http://www.springframework.org/schema/aop/spring-aop.xsd
+         http://www.springframework.org/schema/tx
+     	 http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+	<!--实例化连接池-->
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+		<property name="driverClass" value="com.mysql.jdbc.Driver"></property>
+		<property name="jdbcUrl" value="jdbc:mysql:///test?characterEncoding=UTF8"></property>
+		<property name="user" value="root"></property>
+		<property name="password" value="625251580"></property>
+		<property name="initialPoolSize" value="3"></property>
+		<property name="maxPoolSize" value="6"></property>
+		<property name="acquireIncrement" value="2"></property>
+	</bean>
+
+	<!--创建jdbcTemplate-->
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+
+	<!--实例化deptDao-->
+	<bean id="deptDao" class="cn.ahjz.tx_jdbc.DeptDao" >
+		<property name="jdbcTemplate" ref="jdbcTemplate"></property>
+	</bean>
+
+	<!--申明方式事务管理 事务管理配置-->
+
+	<!--配置事务管理器类-->
+	<bean  id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+
+	<!--事务通知配置 拦截到指定方法后进行事务通知-->
+	<tx:advice id="txAdvice" transaction-manager="txManager">
+		<tx:attributes>
+			<tx:method name="save*" read-only="true"/>
+			<tx:method name="get*" read-only="true"/>
+			<tx:method name="*" read-only="false"/>
+		</tx:attributes>
+	</tx:advice>
+
+	<!--   aop配置=切入点表达式+应用上面的通知  -->
+	<aop:config>
+		<aop:pointcut expression="execution(* cn.ahjz.tx_jdbc.*Dao.*(..))" id="pt"></aop:pointcut>
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="pt"></aop:advisor>
+	</aop:config>
+
+</beans>      
+
+
+
+
+
+
+  

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+	    http://www.springframework.org/schema/aop
+		http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<!-- 实例化dao-->
+	<bean id="userDao" class="cn.ahjz.aop_xml.UserDao"></bean>
+
+	<!-- 实例化aop-->
+	<bean id="aop" class="cn.ahjz.aop_xml.TransactionAop"></bean>
+
+	<!-- AOP配置 -->
+	<aop:config>
+		<!--切入点表达式定义 -->
+		<aop:pointcut id="pt" expression="execution(* cn.ahjz.aop_xml.UserDao.*(..))" />
+
+		<!--切面配置 -->
+		<aop:aspect ref="aop">
+			<aop:before method="begintransactionaop" pointcut-ref="pt"></aop:before>
+			<aop:after method="commit" pointcut-ref="pt"></aop:after>
+		</aop:aspect>
+
+	</aop:config>
+
+
+</beans>      
+
+
+
+
+
+
+  
